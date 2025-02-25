@@ -42,6 +42,6 @@ This project is open-source and available under the MIT License.
 📧 Contact
 🔹 Author: Guruganesh
 🔹 GitHub: guruganeshkannan16@gmail.com
-🔹 Email: your.email@example.com
+🔹 Email: guruganeshkannan16@gmail.com
 
 💡 FileShare makes local file sharing simple and efficient. Try it out today! 🚀📂
