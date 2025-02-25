@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📂✨ FileShare - Drag & Drop Uploads 🚀</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #fceabb, #f8b500);
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: #ffffffcc;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        
+        .drag-area {
+            border: 3px dashed #ff6f61;
+            padding: 30px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 15px;
+            background: #fff3e0;
+            transition: background 0.3s;
+        }
+        
+        .drag-area:hover {
+            background: #ffe0b2;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            background: #ff6f61;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #e65c50;
+        }
+        
+        #progressContainer {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        #progressBar {
+            width: 0%;
+            height: 12px;
+            background-color: #4caf50;
+            border-radius: 8px;
+        }
+        
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        li {
+            padding: 12px;
+            background: #fff;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .file-info {
+            text-align: left;
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+        
+        a {
+            text-decoration: none;
+            color: #ff6f61;
+            font-weight: bold;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .file-actions button,
+        .file-actions a {
+            margin-left: 8px;
+            padding: 6px 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .file-actions button {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .file-actions a {
+            background: #3498db;
+            color: white;
+        }
+        
+        .file-actions button:hover {
+            background: #c0392b;
+        }
+        
+        .file-actions a:hover {
+            background: #2980b9;
+        }
+        /* Styles for the selected files ready to upload */
+        
+        #selectedFilesList {
+            text-align: left;
+            margin: 15px 0;
+        }
+        
+        #selectedFilesList ul {
+            padding: 0;
+        }
+        
+        #selectedFilesList li {
+            display: flex;
+            justify-content: space-between;
+            background: #f9f9f9;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+        
+        #selectedFilesList li button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            background: #ff6f61;
+            color: white;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📂✨ FileShare - Drag & Drop Uploads 🚀</h1>
+
+    <div class="container">
+        <h2>⬆️ Upload File(s) 🎉</h2>
+        <!-- The file input now only allows file selection (no folder uploads) -->
+        <div class="drag-area" id="dragArea">
+            <p>Drag & Drop files here 📥 or <strong>Click</strong> to select 💻</p>
+            <input type="file" id="fileInput" multiple />
+        </div>
+        <!-- Display selected files ready to upload -->
+        <div id="selectedFilesList"></div>
+        <button onclick="uploadFiles()">Upload Now 🚀</button>
+        <div id="progressContainer">
+            <div id="progressBar"></div>
+        </div>
+        <p id="uploadStatus"></p>
+    </div>
+
+    <div class="container">
+        <h2>📁 Your Files</h2>
+        <form id="batchDownloadForm" method="POST" action="/batch_download">
+            <ul>
+                {% for file in files %}
+                <li>
+                    <input type="checkbox" name="files" value="{{ file.name }}" />
+                    <div class="file-info">
+                        <strong>{{ file.name }}</strong><br />
+                        <small>Uploaded: {{ file.upload_time|datetimeformat }}</small>
+                    </div>
+                    <div class="file-actions">
+                        <a href="/download/{{ file.name }}">Download 💾</a>
+                        <a href="/preview/{{ file.name }}" target="_blank">Preview 👁️</a>
+                        <button type="button" onclick="deleteFile('{{ file.name }}')">Delete 🗑️</button>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Download Selected as ZIP 📦</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Developed By Edoble. Made with love from Edoble ❤️. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        let selectedFiles = [];
+        const dragArea = document.getElementById("dragArea");
+        const fileInput = document.getElementById("fileInput");
+        const selectedFilesList = document.getElementById("selectedFilesList");
+
+        // Update UI for files ready to upload
+        function updateSelectedFilesUI() {
+            if (selectedFiles.length === 0) {
+                selectedFilesList.innerHTML = "";
+                return;
+            }
+            let html = "<ul>";
+            selectedFiles.forEach((file, index) => {
+                html += `<li>${file.name} <button onclick="removeFile(${index})">Remove ❌</button></li>`;
+            });
+            html += "</ul>";
+            selectedFilesList.innerHTML = html;
+        }
+
+        // Remove a file from the selectedFiles array
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateSelectedFilesUI();
+        }
+
+        // Add files from the file input
+        fileInput.addEventListener("change", () => {
+            for (let i = 0; i < fileInput.files.length; i++) {
+                selectedFiles.push(fileInput.files[i]);
+            }
+            updateSelectedFilesUI();
+            fileInput.value = ""; // reset to allow re-selection if needed
+        });
+
+        // Drag & drop events to add files
+        dragArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dragArea.style.background = "#ffe0b2";
+        });
+        dragArea.addEventListener("dragleave", () => {
+            dragArea.style.background = "#fff3e0";
+        });
+        dragArea.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dragArea.style.background = "#fff3e0";
+            const files = e.dataTransfer.files;
+            for (let i = 0; i < files.length; i++) {
+                // Only add file if it is not a folder (folder drops are not allowed)
+                if (!files[i].webkitRelativePath) {
+                    selectedFiles.push(files[i]);
+                }
+            }
+            updateSelectedFilesUI();
+        });
+        dragArea.addEventListener("click", () => {
+            fileInput.click();
+        });
+
+        // Upload files using the selectedFiles array
+        function uploadFiles() {
+            if (selectedFiles.length === 0) {
+                alert("Please select at least one file to upload! ❌");
+                return;
+            }
+            const formData = new FormData();
+            selectedFiles.forEach((file) => {
+                formData.append("file", file);
+            });
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/upload", true);
+            document.getElementById("progressContainer").style.display = "block";
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    let percentComplete = (event.loaded / event.total) * 100;
+                    document.getElementById("progressBar").style.width =
+                        percentComplete + "%";
+                    document.getElementById("uploadStatus").textContent =
+                        `Uploading... ${Math.round(percentComplete)}%`;
+                }
+            };
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    document.getElementById("uploadStatus").textContent =
+                        "✅ Upload Complete!";
+                    selectedFiles = [];
+                    updateSelectedFilesUI();
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    document.getElementById("uploadStatus").textContent =
+                        "❌ Upload Failed!";
+                }
+            };
+            xhr.onerror = function() {
+                document.getElementById("uploadStatus").textContent =
+                    "❌ Error uploading file!";
+            };
+            xhr.send(formData);
+        }
+
+        function deleteFile(filename) {
+            if (!confirm("Are you sure you want to delete " + filename + "?"))
+                return;
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/delete/" + filename, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    alert("File deleted successfully! 🗑️");
+                    location.reload();
+                } else {
+                    alert("Error deleting file! ❌");
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>
