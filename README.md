@@ -11,40 +11,7 @@ FileShare is a simple and efficient local file-sharing system that allows users 
 ✅ Minimalist & User-Friendly UI – Clean and easy to use.
 ✅ Runs on Local Network – No internet required.
 
-🛠️ Installation & Setup
-1️⃣ Clone the Repository
-sh
-Copy
-Edit
-git clone https://github.com/Guruganeshkannan/fileshare.git
-cd fileshare
-2️⃣ Install Dependencies
-Ensure Python & Flask are installed:
-
-sh
-Copy
-Edit
-pip install flask
-3️⃣ Run the Server
-sh
-Copy
-Edit
-python fileshare.py
-4️⃣ Access the Web Interface
-Open http://localhost:8080/ in your browser.
-Drag & Drop files or click to upload.
-Download files instantly from the displayed list.
-🎨 Project Structure
-bash
-Copy
-Edit
-📂 fileshare/
-│── 📂 templates/          # HTML UI files
-│   ├── index.html        # Main web interface
-│
-│── 📂 uploads/            # Stored files (auto-created)
-│── fileshare.py           # Flask backend
-│── README.md              # Project documentation      
+      
 🔧 Technologies Used
 Python 3
 Flask (Micro Web Framework)
