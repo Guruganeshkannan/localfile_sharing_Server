@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Guruganeshkannan/localfile_sharing_Server/main/banner.png" alt="FileShare Banner" width="80%">
-</p>
-
 <h1 align="center">📂 FileShare - Local File Sharing System 🚀</h1>
 
 <p align="center">
