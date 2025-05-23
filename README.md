@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Guruganeshkannan/localfile_sharing_Server/main/assets/banner.png" alt="FileShare Banner" width="80%">
+  <img src="https://raw.githubusercontent.com/Guruganeshkannan/localfile_sharing_Server/main/banner.png" alt="FileShare Banner" width="80%">
 </p>
 
 <h1 align="center">📂 FileShare - Local File Sharing System 🚀</h1>
@@ -67,9 +67,6 @@ Copy
 Edit
 python server.py
 4️⃣ Open in Browser
-arduino
-Copy
-Edit
 http://localhost:5000/
 🖥️ How to Open & Run the Code
 Using Command Line / Terminal
