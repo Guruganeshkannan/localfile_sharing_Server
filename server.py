@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from io import BytesIO
 import socket
-import pyqrcode  # Ensure you install this via: pip install pyqrcode
+import pyqrcode  # Used only for the terminal QR; ensure it's installed: pip install pyqrcode
 
 app = Flask(__name__)
 
@@ -13,11 +13,13 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
+# Global in-memory chat storage (for demo purposes)
+chat_messages = []
+
 # Get the server's IPv4 address
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # Connect to a public DNS server; the IP isn't actually used
         s.connect(("8.8.8.8", 80))
         ip = s.getsockname()[0]
     except Exception:
@@ -29,7 +31,7 @@ def get_ip():
 # Print an ASCII QR code in the terminal using pyqrcode
 def print_qr_terminal(data):
     qr = pyqrcode.create(data)
-    # Print with a quiet zone of 1
+    # Print as an ASCII representation with a quiet zone of 1
     print(qr.terminal(quiet_zone=1))
 
 # Template filter to format timestamps
@@ -119,6 +121,30 @@ def delete_file(filename):
         return jsonify({"message": f"Deleted {filename} 🗑️", "status": "success"})
     else:
         return jsonify({"message": "File not found 😕", "status": "error"})
+
+# Chat endpoints
+
+# GET /chat returns all messages as JSON
+@app.route("/chat", methods=["GET"])
+def get_chat():
+    return jsonify(chat_messages)
+
+# POST /chat accepts a new message (expects JSON with "message" and optionally "user")
+@app.route("/chat", methods=["POST"])
+def send_chat():
+    global chat_messages
+    data = request.get_json()
+    message = data.get("message", "").strip()
+    user = data.get("user", "Anonymous")
+    if message:
+        chat_messages.append({
+            "user": user,
+            "message": message,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+        return jsonify({"status": "success"}), 200
+    else:
+        return jsonify({"status": "error", "message": "Empty message"}), 400
 
 # QR Code image route using an external API (redirects to a QR code generator)
 @app.route("/qr_img")
